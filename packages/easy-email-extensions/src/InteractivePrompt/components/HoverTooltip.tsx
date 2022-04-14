@@ -10,8 +10,9 @@ import {
 } from 'easy-email-editor';
 import { awaitForElement } from '@extensions/utils/awaitForElement';
 import { useLazyState } from 'easy-email-editor';
+import { observer } from 'mobx-react-lite';
 
-export function HoverTooltip() {
+export const HoverTooltip = observer(() => {
   const { hoverIdx, direction, isDragging } = useHoverIdx();
   const lazyHoverIdx = useLazyState(hoverIdx, 60);
   const { focusIdx } = useFocusIdx();
@@ -89,7 +90,8 @@ export function HoverTooltip() {
       )}
     </>
   );
-}
+});
+
 
 interface TipNodeProps {
   title: string;

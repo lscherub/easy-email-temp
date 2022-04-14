@@ -1,31 +1,27 @@
-import { useCallback, useContext } from 'react';
-import { HoverIdxContext } from '@/components/Provider/HoverIdxProvider';
-import { debounce } from 'lodash';
+import { useEffect, useState } from 'react';
+import { store } from '@/store';
+import { autorun } from 'mobx';
 
 export function useHoverIdx() {
-  const {
-    hoverIdx,
-    setHoverIdx,
-    setIsDragging,
-    isDragging,
-    setDirection,
-    direction,
-  } = useContext(HoverIdxContext);
+  const [hoverIdx, setHoverIdx] = useState(store.blockState.hoverIdx);
+  const [isDragging, setIsDragging] = useState(store.blockState.isDragging);
+  const [direction, setDirection] = useState(store.blockState.direction);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setHoverIdxDebounce = useCallback(debounce(setHoverIdx), [setHoverIdx]);
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const setDirectionDebounce = useCallback(debounce(setDirection), [
-    setDirection,
-  ]);
+  useEffect(() => {
+    const disposer = autorun(() => {
+      setHoverIdx(store.blockState.hoverIdx);
+      setIsDragging(store.blockState.isDragging);
+      setDirection(store.blockState.direction);
+    });
+    return disposer;
+  }, []);
 
   return {
     hoverIdx,
-    setHoverIdx: setHoverIdxDebounce,
+    setHoverIdx: store.blockState.setHoverIdx,
     isDragging,
-    setIsDragging,
+    setIsDragging: store.blockState.setIsDragging,
     direction,
-    setDirection: setDirectionDebounce,
+    setDirection: store.blockState.setDirection,
   };
 }

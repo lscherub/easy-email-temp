@@ -11,21 +11,21 @@ export interface IBlock<T extends IBlockData = IBlockData> {
     idx: string | null,
     mode: 'testing' | 'production',
     context?: IPage,
-    dataSource?: { [key: string]: any; }
+    dataSource?: { [key: string]: any }
   ) => IBlockData | ReactElement | null;
 }
 
 export interface IBlockData<
-  K extends { [key: string]: any; } = any,
-  T extends { [key: string]: any; } = any
-  > {
+  Attr extends Record<string, string> = any,
+  Data extends { [key: string]: any } = any
+> {
   title?: string;
   type: string;
   data: {
-    value: T;
+    value: Data;
     hidden?: boolean | string;
   };
-  attributes: K & { 'css-class'?: string; };
+  attributes: Attr & { 'css-class'?: string };
   children: IBlockData[];
 }
 
@@ -35,8 +35,8 @@ export interface create<T extends any = any> {
 
 export type RecursivePartial<T> = {
   [P in keyof T]?: T[P] extends (infer U)[]
-  ? RecursivePartial<U>[]
-  : T[P] extends object
-  ? RecursivePartial<T[P]>
-  : T[P];
+    ? RecursivePartial<U>[]
+    : T[P] extends object
+    ? RecursivePartial<T[P]>
+    : T[P];
 };

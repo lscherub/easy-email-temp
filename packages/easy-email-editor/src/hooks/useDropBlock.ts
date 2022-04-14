@@ -1,33 +1,25 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 
-import {
-  getNodeIdxFromClassName,
-} from 'easy-email-core';
+import { getNodeIdxFromClassName } from 'easy-email-core';
 import { getBlockNodeByChildEle } from '@/utils/getBlockNodeByChildEle';
-import { useBlock } from '@/hooks/useBlock';
 import { getDirectionPosition } from '@/utils/getDirectionPosition';
 import { useFocusIdx } from './useFocusIdx';
-import { useDataTransfer } from './useDataTransfer';
 import { useHoverIdx } from './useHoverIdx';
 import { getInsertPosition } from '@/utils/getInsertPosition';
 import { useEditorProps } from './useEditorProps';
 import { DATA_ATTRIBUTE_DROP_CONTAINER } from '@/constants';
+import { store } from '@/store';
+import { IEmailTemplate } from '@/typings';
 
-export function useDropBlock() {
+export function useDropBlock(values: IEmailTemplate) {
   const [ref, setRef] = useState<HTMLElement | null>(null);
-  const { values, focusBlock } = useBlock();
   const { autoComplete } = useEditorProps();
-  const { dataTransfer, setDataTransfer } = useDataTransfer();
   const cacheValues = useRef(values);
-  const cacheDataTransfer = useRef(dataTransfer);
 
   useEffect(() => {
     cacheValues.current = values;
   }, [values]);
 
-  useEffect(() => {
-    cacheDataTransfer.current = dataTransfer;
-  }, [dataTransfer]);
   const { setFocusIdx, focusIdx } = useFocusIdx();
   const { setHoverIdx, setDirection, isDragging, hoverIdx, direction } =
     useHoverIdx();
@@ -88,7 +80,7 @@ export function useDropBlock() {
       };
 
       const onDragOver = (ev: DragEvent) => {
-        if (!cacheDataTransfer.current) return;
+        if (!store.blockState.dataTransfer) return;
 
         if (ev.target === lastDragover.target) {
           if (lastDragover.valid) {
@@ -110,18 +102,16 @@ export function useDropBlock() {
             context: cacheValues.current,
             idx,
             directionPosition,
-            dragType: cacheDataTransfer.current.type,
+            dragType: store.blockState.dataTransfer.type,
           });
 
           if (positionData) {
             ev.preventDefault();
             lastDragover.valid = true;
-            setDataTransfer((dataTransfer: any) => {
-              return {
-                ...dataTransfer,
-                parentIdx: positionData.parentIdx,
-                positionIndex: positionData.insertIndex,
-              };
+            store.blockState.setDataTransfer({
+              ...store.blockState.dataTransfer,
+              parentIdx: positionData.parentIdx,
+              positionIndex: positionData.insertIndex,
             });
             setDirection(positionData.endDirection);
             setHoverIdx(positionData.hoverIdx);
@@ -130,11 +120,9 @@ export function useDropBlock() {
         if (!lastDragover.valid) {
           setDirection('');
           setHoverIdx('');
-          setDataTransfer((dataTransfer: any) => {
-            return {
-              ...dataTransfer,
-              parentIdx: undefined,
-            };
+          store.blockState.setDataTransfer({
+            ...store.blockState.dataTransfer,
+            parentIdx: undefined,
           });
         }
       };
@@ -151,11 +139,9 @@ export function useDropBlock() {
         if (!isDropContainer) {
           setDirection('');
           setHoverIdx('');
-          setDataTransfer((dataTransfer: any) => {
-            return {
-              ...dataTransfer,
-              parentIdx: undefined,
-            };
+          store.blockState.setDataTransfer({
+            ...store.blockState.dataTransfer!,
+            parentIdx: undefined,
           });
         }
       };
@@ -174,14 +160,7 @@ export function useDropBlock() {
         window.removeEventListener('dragover', onCheckDragLeave);
       };
     }
-  }, [
-    autoComplete,
-    cacheDataTransfer,
-    ref,
-    setDataTransfer,
-    setDirection,
-    setHoverIdx,
-  ]);
+  }, [autoComplete, ref, setDirection, setHoverIdx]);
 
   useEffect(() => {
     if (!ref) return;

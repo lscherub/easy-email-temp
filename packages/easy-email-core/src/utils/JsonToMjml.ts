@@ -21,22 +21,22 @@ export interface JsonToMjmlOptionProduction {
   context?: IBlockData;
   mode: 'production';
   keepClassName?: boolean;
-  dataSource?: { [key: string]: any; };
+  dataSource?: { [key: string]: any };
 }
 
 export interface JsonToMjmlOptionDev {
   data: IBlockData;
   idx: string | null; // current idx
   context?: IBlockData;
-  dataSource?: { [key: string]: any; };
+  dataSource?: { [key: string]: any };
   mode: 'testing';
 }
 
-export type JsonToMjmlOption =
-  | JsonToMjmlOptionDev
-  | JsonToMjmlOptionProduction;
+export type JsonToMjmlOption = JsonToMjmlOptionDev | JsonToMjmlOptionProduction;
 
-const isProductionMode = (option: JsonToMjmlOption): option is JsonToMjmlOptionProduction => option.mode === 'production';
+const isProductionMode = (
+  option: JsonToMjmlOption
+): option is JsonToMjmlOptionProduction => option.mode === 'production';
 
 export function JsonToMjml(options: JsonToMjmlOption): string {
   const {
@@ -61,7 +61,9 @@ export function JsonToMjml(options: JsonToMjmlOption): string {
   );
 
   const isTest = mode === 'testing';
-  const keepClassName = isProductionMode(options) ? options.keepClassName : false;
+  const keepClassName = isProductionMode(options)
+    ? options.keepClassName
+    : false;
   const placeholder = isTest ? renderPlaceholder(data.type) : '';
 
   if (isTest && idx) {
@@ -74,7 +76,10 @@ export function JsonToMjml(options: JsonToMjmlOption): string {
   }
 
   if (keepClassName) {
-    att['css-class'] = classnames(att['css-class'], getNodeTypeClassName(data.type));
+    att['css-class'] = classnames(
+      att['css-class'],
+      getNodeTypeClassName(data.type)
+    );
   }
 
   if (isTest && data.type === BasicType.TEXT) {
@@ -137,7 +142,7 @@ export function JsonToMjml(options: JsonToMjmlOption): string {
       context: context,
       dataSource,
       mode,
-      keepClassName
+      keepClassName,
     });
   }
 
@@ -156,7 +161,7 @@ export function JsonToMjml(options: JsonToMjmlOption): string {
         dataSource,
         context,
         mode,
-        keepClassName
+        keepClassName,
       });
     })
     .join('\n');
@@ -176,24 +181,29 @@ export function JsonToMjml(options: JsonToMjmlOption): string {
         ? `<mj-raw>
             <meta name="viewport" />
            </mj-raw>
-           <mj-style inline="inline">.mjml-body { width: ${data.attributes.width || '600px'
-        }; margin: 0px auto; }</mj-style>`
+           <mj-style inline="inline">.mjml-body { width: ${
+             data.attributes.width || '600px'
+           }; margin: 0px auto; }</mj-style>`
         : '';
       const styles =
         value.headStyles
           ?.map(
             (style) =>
-              `<mj-style ${style.inline ? 'inline="inline"' : ''}>${style.content
+              `<mj-style ${style.inline ? 'inline="inline"' : ''}>${
+                style.content
               }</mj-style>`
           )
           .join('\n') || '';
 
       const userStyle = value['user-style']
-        ? `<mj-style ${value['user-style'].inline ? 'inline="inline"' : ''}>${value['user-style'].content
-        }</mj-style>`
+        ? `<mj-style ${value['user-style'].inline ? 'inline="inline"' : ''}>${
+            value['user-style'].content
+          }</mj-style>`
         : '';
 
-      const extraHeadContent = value.extraHeadContent ? `<mj-raw>${value.extraHeadContent}</mj-raw>` : '';
+      const extraHeadContent = value.extraHeadContent
+        ? `<mj-raw>${value.extraHeadContent}</mj-raw>`
+        : '';
 
       return `
         <mjml>
@@ -205,39 +215,48 @@ export function JsonToMjml(options: JsonToMjmlOption): string {
               ${breakpoint}
               ${extraHeadContent}
               ${value.fonts
-          ?.filter(Boolean)
-          .map(
-            (item) =>
-              `<mj-font name="${item.name}" href="${item.href}" />`
-          )}
+                ?.filter(Boolean)
+                .map(
+                  (item) =>
+                    `<mj-font name="${item.name}" href="${item.href}" />`
+                )}
             <mj-attributes>
               ${value.headAttributes}
-              ${value['font-family']
-          ? `<mj-all font-family="${value['font-family'].replace(/"/gm, '')}" />`
-          : ''
+              ${
+                value['font-family']
+                  ? `<mj-all font-family="${value['font-family'].replace(
+                      /"/gm,
+                      ''
+                    )}" />`
+                  : ''
+              }
+              ${
+                value['font-size']
+                  ? `<mj-text font-size="${value['font-size']}" />`
+                  : ''
+              }
+              ${
+                value['text-color']
+                  ? `<mj-text color="${value['text-color']}" />`
+                  : ''
+              }
+        ${
+          value['line-height']
+            ? `<mj-text line-height="${value['line-height']}" />`
+            : ''
         }
-              ${value['font-size']
-          ? `<mj-text font-size="${value['font-size']}" />`
-          : ''
+        ${
+          value['font-weight']
+            ? `<mj-text font-weight="${value['font-weight']}" />`
+            : ''
         }
-              ${value['text-color']
-          ? `<mj-text color="${value['text-color']}" />`
-          : ''
-        }
-        ${value['line-height']
-          ? `<mj-text line-height="${value['line-height']}" />`
-          : ''
-        }
-        ${value['font-weight']
-          ? `<mj-text font-weight="${value['font-weight']}" />`
-          : ''
-        }
-              ${value['content-background-color']
-          ? `<mj-wrapper background-color="${value['content-background-color']}" />
+              ${
+                value['content-background-color']
+                  ? `<mj-wrapper background-color="${value['content-background-color']}" />
                      <mj-section background-color="${value['content-background-color']}" />
                     `
-          : ''
-        }
+                  : ''
+              }
 
             </mj-attributes>
           </mj-head>
@@ -267,9 +286,10 @@ export function JsonToMjml(options: JsonToMjmlOption): string {
     case BasicType.WRAPPER:
       return `
               <mj-wrapper ${attributeStr}>
-               ${children ||
-        `<mj-section><mj-column>${placeholder}</mj-column></mj-section>`
-        }
+               ${
+                 children ||
+                 `<mj-section><mj-column>${placeholder}</mj-column></mj-section>`
+               }
               </mj-wrapper>
             `;
     case BasicType.CAROUSEL:
@@ -402,25 +422,26 @@ export function generaMjmlMetaData(data: IPage) {
   return `
     <mj-html-attributes>
       ${attributes
-      .filter((key) => values[key as keyof typeof values] !== undefined)
-      .map((key) => {
-        const attKey = key as keyof typeof values;
-        const isMultipleAttributes = isObject(values[attKey]);
-        const value = isMultipleAttributes
-          ? Object.keys(values[attKey]!)
-            .map(
-              (childKey) => {
-                const childValue = (values[attKey] as any)[childKey];
+        .filter((key) => values[key as keyof typeof values] !== undefined)
+        .map((key) => {
+          const attKey = key as keyof typeof values;
+          const isMultipleAttributes = isObject(values[attKey]);
+          const value = isMultipleAttributes
+            ? Object.keys(values[attKey]!)
+                .map((childKey) => {
+                  const childValue = (values[attKey] as any)[childKey];
 
-                return `${childKey}="${isString(childValue) ? childValue.replace(/"/gm, '') : childValue}"`;
-              }
-
-            )
-            .join(' ')
-          : `${key}="${values[attKey]}"`;
-        return `<mj-html-attribute class="easy-email" multiple-attributes="${isMultipleAttributes}" attribute-name="${key}" ${value}></mj-html-attribute>`;
-      })
-      .join('\n')}
+                  return `${childKey}="${
+                    isString(childValue)
+                      ? childValue.replace(/"/gm, '')
+                      : childValue
+                  }"`;
+                })
+                .join(' ')
+            : `${key}="${values[attKey]}"`;
+          return `<mj-html-attribute class="easy-email" multiple-attributes="${isMultipleAttributes}" attribute-name="${key}" ${value}></mj-html-attribute>`;
+        })
+        .join('\n')}
 
     </mj-html-attributes>
   `;

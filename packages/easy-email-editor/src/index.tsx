@@ -17,9 +17,9 @@ export { useDomScrollHeight } from './hooks/useDomScrollHeight';
 export { useRefState } from './hooks/useRefState';
 export { useLazyState } from './hooks/useLazyState';
 export { useFocusBlockLayout } from './hooks/useFocusBlockLayout';
-export * from './hooks/useDataTransfer';
 export * from './hooks/useFocusIdx';
 export * from './hooks/useHoverIdx';
+export { store } from './store';
 
 export { ActiveTabKeys } from './components/Provider/BlocksProvider';
 

@@ -52,7 +52,7 @@ export const SimpleLayout: React.FC<
                 onClick={() => setCollapsed(v => !v)}
               />
             </Card.Grid>
-            <Card.Grid
+            {/* <Card.Grid
               className={styles.customScrollBar}
               style={{
                 flex: 1,
@@ -68,14 +68,14 @@ export const SimpleLayout: React.FC<
                   <BlockLayer renderTitle={props.renderTitle} />
                 )}
               </Card>
-            </Card.Grid>
+            </Card.Grid> */}
 
           </Card>
         </Layout.Sider>
 
         <Layout style={{ height: containerHeight }}>{props.children}</Layout>
 
-        <Layout.Sider
+        {/* <Layout.Sider
           style={{
             height: containerHeight,
             minWidth: 300,
@@ -106,7 +106,7 @@ export const SimpleLayout: React.FC<
               )}
             </Tabs>
           </Card>
-        </Layout.Sider>
+        </Layout.Sider> */}
 
         <InteractivePrompt />
         <MergeTagBadgePrompt />

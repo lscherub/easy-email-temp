@@ -1,6 +1,6 @@
 import { BasicType } from 'easy-email-core';
 import { cloneDeep, debounce, get } from 'lodash';
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import {
   IBlockData,
   getIndexByIdx,
@@ -12,26 +12,15 @@ import {
   createBlockDataByType,
 } from 'easy-email-core';
 
-import { useEditorContext } from './useEditorContext';
-import { RecordContext } from '@/components/Provider/RecordProvider';
-import { useFocusIdx } from './useFocusIdx';
 import { IEmailTemplate } from '@/typings';
 import { useEditorProps } from './useEditorProps';
 import { scrollBlockEleIntoView } from '@/utils';
+import { store } from '@/store';
 
 export function useBlock() {
-  const {
-    formState: { values },
-    formHelpers: { getState, change },
-  } = useEditorContext();
-
-  const { focusIdx, setFocusIdx } = useFocusIdx();
-
   const { autoComplete } = useEditorProps();
 
-  const focusBlock = get(values, focusIdx) as IBlockData | null;
-
-  const { redo, undo, redoable, undoable, reset } = useContext(RecordContext);
+  const focusBlock = get(store.block.data, store.blockState.focusIdx);
 
   const addBlock = useCallback(
     (params: {
@@ -45,7 +34,7 @@ export function useBlock() {
 
       let { type, parentIdx, positionIndex, payload } = params;
       let nextFocusIdx: string;
-      const values = cloneDeep(getState().values) as IEmailTemplate;
+      const values = cloneDeep(store.block.data) as IEmailTemplate;
       const parent = get(values, parentIdx) as IBlockData | null;
       if (!parent) {
         console.error(`Invalid ${type} block`);
@@ -87,7 +76,7 @@ export function useBlock() {
         if (upParent) {
           upParent.children.splice(parentIndex, 1, child);
 
-          return change(getParentIdx(parentIdx)!, { ...upParent });
+          return store.block.update(getParentIdx(parentIdx)!, { ...upParent });
         }
       }
 
@@ -103,14 +92,14 @@ export function useBlock() {
 
       parent.children.splice(positionIndex, 0, child);
       console.timeLog();
-      change(parentIdx, parent); // listeners not notified
-      setFocusIdx(nextFocusIdx);
+      store.block.update(parentIdx, parent); // listeners not notified
+      store.blockState.setFocusIdx(nextFocusIdx);
       scrollBlockEleIntoView({
         idx: nextFocusIdx,
       });
       console.timeEnd();
     },
-    [autoComplete, change, getState, setFocusIdx]
+    [autoComplete]
   );
 
   const moveBlock = useCallback(
@@ -119,7 +108,7 @@ export function useBlock() {
 
       let nextFocusIdx: string;
 
-      const values = cloneDeep(getState().values) as IEmailTemplate;
+      const values = cloneDeep(store.block.data) as IEmailTemplate;
       const source = getValueByIdx(values, sourceIdx)!;
       const sourceParentIdx = getParentIdx(sourceIdx);
       const destinationParentIdx = getParentIdx(destinationIdx);
@@ -160,96 +149,87 @@ export function useBlock() {
         nextFocusIdx = destinationIdx;
       }
 
-      change(getPageIdx(), { ...values.content });
+      store.block.update(getPageIdx(), { ...values.content });
 
       setTimeout(() => {
-        setFocusIdx(nextFocusIdx);
+        store.blockState.setFocusIdx(nextFocusIdx);
       }, 50);
 
       scrollBlockEleIntoView({
         idx: nextFocusIdx,
       });
     },
-    [autoComplete, change, getState, setFocusIdx]
+    [autoComplete]
   );
 
-  const copyBlock = useCallback(
-    (idx: string) => {
-      let nextFocusIdx: string;
-      const values = cloneDeep(getState().values) as IEmailTemplate;
+  const copyBlock = useCallback((idx: string) => {
+    let nextFocusIdx: string;
+    const values = cloneDeep(store.block.data);
 
-      const parentIdx = getParentIdx(idx);
-      if (!parentIdx) return;
-      const parent = get(values, getParentIdx(idx) || '') as IBlockData | null;
-      if (!parent) {
-        console.error('Invalid block');
+    const parentIdx = getParentIdx(idx);
+    if (!parentIdx) return;
+    const parent = get(values, getParentIdx(idx) || '') as IBlockData | null;
+    if (!parent) {
+      console.error('Invalid block');
+      return;
+    }
+    const copyBlock = cloneDeep(get(values, idx));
+    const index = getIndexByIdx(idx) + 1;
+
+    parent.children.splice(index, 0, copyBlock);
+    store.block.update(parentIdx, parent);
+    nextFocusIdx = `${parentIdx}.children.[${index}]`;
+
+    store.blockState.setFocusIdx(nextFocusIdx);
+  }, []);
+
+  const removeBlock = useCallback((idx: string) => {
+    let nextFocusIdx: string;
+    const values = cloneDeep(store.block.data) as IEmailTemplate;
+
+    const block = getValueByIdx(values, idx);
+    if (!block) {
+      console.error('Invalid block');
+      return;
+    }
+    const parentIdx = getParentIdx(idx);
+    const parent = get(values, getParentIdx(idx) || '') as IBlockData | null;
+    const blockIndex = getIndexByIdx(idx);
+    if (!parentIdx || !parent) {
+      if (block.type === BasicType.PAGE) {
+        console.error('Page node can not remove');
         return;
       }
-      const copyBlock = cloneDeep(get(values, idx));
-      const index = getIndexByIdx(idx) + 1;
+      console.error('Invalid block');
+      return;
+    }
+    nextFocusIdx = parentIdx;
 
-      parent.children.splice(index, 0, copyBlock);
-      change(parentIdx, parent);
-      nextFocusIdx = `${parentIdx}.children.[${index}]`;
-
-      setFocusIdx(nextFocusIdx);
-    },
-    [change, getState, setFocusIdx]
-  );
-
-  const removeBlock = useCallback(
-    (idx: string) => {
-      let nextFocusIdx: string;
-      const values = cloneDeep(getState().values) as IEmailTemplate;
-
-      const block = getValueByIdx(values, idx);
-      if (!block) {
-        console.error('Invalid block');
-        return;
-      }
-      const parentIdx = getParentIdx(idx);
-      const parent = get(values, getParentIdx(idx) || '') as IBlockData | null;
-      const blockIndex = getIndexByIdx(idx);
-      if (!parentIdx || !parent) {
-        if (block.type === BasicType.PAGE) {
-          console.error('Page node can not remove');
-          return;
-        }
-        console.error('Invalid block');
-        return;
-      }
-      nextFocusIdx = parentIdx;
-
-      parent.children.splice(blockIndex, 1);
-      change(parentIdx, parent);
-      setFocusIdx(nextFocusIdx);
-    },
-    [change, getState, setFocusIdx]
-  );
+    parent.children.splice(blockIndex, 1);
+    store.block.update(parentIdx, parent);
+    store.blockState.setFocusIdx(nextFocusIdx);
+  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const setValueByIdx = useCallback(
     debounce(<T extends IBlockData>(idx: string, newVal: T) => {
-      change(idx, {
+      store.block.update(idx, {
         ...newVal,
       });
     }),
-    [change]
+    []
   );
 
-  const isExistBlock = useCallback(
-    (idx: string) => {
-      return Boolean(get(values, idx));
-    },
-    [values]
-  );
+  const isExistBlock = useCallback((idx: string) => {
+    return Boolean(get(store.block.data, idx));
+  }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const setFocusBlock = useCallback(
     debounce((val) => {
-      change(focusIdx, { ...val });
+      store.block.update(store.blockState.focusIdx, { ...val });
     }),
-    [focusBlock, focusIdx, change]
+    [focusBlock]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -257,14 +237,12 @@ export function useBlock() {
     debounce((val) => {
       if (!focusBlock) return;
       focusBlock.data.value = val;
-      change(focusIdx, { ...focusBlock });
+      store.block.update(store.blockState.focusIdx, { ...focusBlock });
     }),
-    [focusBlock, focusIdx]
+    [focusBlock]
   );
 
   return {
-    values,
-    change,
     focusBlock,
     setFocusBlock,
     setFocusBlockValue,
@@ -274,10 +252,5 @@ export function useBlock() {
     copyBlock,
     removeBlock,
     isExistBlock,
-    redo,
-    undo,
-    reset,
-    redoable,
-    undoable,
   };
 }

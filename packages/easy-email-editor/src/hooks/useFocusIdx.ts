@@ -1,10 +1,20 @@
-import { BlocksContext } from '@/components/Provider/BlocksProvider';
-import { useContext } from 'react';
+import { store } from '@/store';
+import { autorun } from 'mobx';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 export function useFocusIdx() {
-  const { focusIdx, setFocusIdx } = useContext(BlocksContext);
+  const [focusIdx, setFocusIdx] = useState(store.blockState.focusIdx);
+
+  useEffect(() => {
+    const disposer = autorun(() => {
+      setFocusIdx(store.blockState.focusIdx);
+    });
+    return disposer;
+  }, []);
+
   return {
     focusIdx,
-    setFocusIdx,
+    setFocusIdx: store.blockState.setFocusIdx,
   };
 }

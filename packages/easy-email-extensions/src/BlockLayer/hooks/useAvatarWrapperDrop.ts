@@ -1,29 +1,28 @@
 import { getParentIdx, getIndexByIdx } from 'easy-email-core';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   getBlockNodeByChildEle,
   getDirectionPosition,
+  store,
   useEditorContext,
-  useDataTransfer,
   useHoverIdx,
   useRefState,
 } from 'easy-email-editor';
+
 import { BlockManager, getNodeIdxFromClassName } from 'easy-email-core';
 import { debounce, get } from 'lodash';
 import { IBlockDataWithId } from '..';
 import { BlockTreeProps } from '../components/BlockTree';
 
-export function useAvatarWrapperDrop() {
+export const useAvatarWrapperDrop = () => {
   const [blockLayerRef, setBlockLayerRef] = useState<HTMLElement | null>(null);
 
   const { setHoverIdx, setDirection } = useHoverIdx();
-  const { dataTransfer, setDataTransfer } = useDataTransfer();
   const {
     formState: { values },
   } = useEditorContext();
 
   const valuesRef = useRefState(values);
-  const dataTransferRef = useRefState(dataTransfer);
 
   function isKeyObject(o: any): o is {
     key: string;
@@ -103,7 +102,7 @@ export function useAvatarWrapperDrop() {
   useEffect(() => {
     if (blockLayerRef) {
       const onDragOver = debounce((ev: DragEvent) => {
-        if (!dataTransferRef.current) return;
+        if (!store.blockState.dataTransfer) return;
 
         const blockNode = getBlockNodeByChildEle(ev.target as HTMLDivElement);
         if (!blockNode || !ev.target) return;
@@ -139,7 +138,7 @@ export function useAvatarWrapperDrop() {
         }
         const dropResult = allowDrop({
           dragNode: {
-            type: dataTransferRef.current.type,
+            type: store.blockState.dataTransfer.type,
           },
           dropNode: {
             dataRef: dropBlockData,
@@ -162,30 +161,24 @@ export function useAvatarWrapperDrop() {
 
         if (dropResult.position === -1) {
           treeNodeEle.classList.add('arco-tree-node-title-gap-top');
-          setDataTransfer((dataTransfer: any) => {
-            return {
-              ...dataTransfer,
-              parentIdx: dropParentIdx,
-              positionIndex: getIndexByIdx(dropIdx),
-            };
+          store.blockState.setDataTransfer({
+            ...store.blockState.dataTransfer!,
+            parentIdx: dropParentIdx,
+            positionIndex: getIndexByIdx(dropIdx),
           });
         } else if (dropResult.position === 1) {
-          setDataTransfer((dataTransfer: any) => {
-            return {
-              ...dataTransfer,
-              parentIdx: dropParentIdx,
-              positionIndex: getIndexByIdx(dropIdx) + 1,
-            };
+          store.blockState.setDataTransfer({
+            ...store.blockState.dataTransfer!,
+            parentIdx: dropParentIdx,
+            positionIndex: getIndexByIdx(dropIdx) + 1,
           });
           treeNodeEle.classList.add('arco-tree-node-title-gap-bottom');
         } else {
           treeNodeEle.classList.add('arco-tree-node-title-highlight');
-          setDataTransfer((dataTransfer: any) => {
-            return {
-              ...dataTransfer,
-              parentIdx: dropIdx,
-              positionIndex: 0,
-            };
+          store.blockState.setDataTransfer({
+            ...store.blockState.dataTransfer!,
+            parentIdx: dropIdx,
+            positionIndex: 0,
           });
         }
       });
@@ -210,16 +203,7 @@ export function useAvatarWrapperDrop() {
         blockLayerRef.removeEventListener('dragleave', onDragend);
       };
     }
-  }, [
-    blockLayerRef,
-    dataTransferRef,
-    valuesRef,
-    removeHightLightClassName,
-    allowDrop,
-    setDirection,
-    setHoverIdx,
-    setDataTransfer,
-  ]);
+  }, [blockLayerRef, valuesRef, removeHightLightClassName, allowDrop, setDirection, setHoverIdx]);
 
   return {
     setBlockLayerRef,
@@ -227,7 +211,7 @@ export function useAvatarWrapperDrop() {
     allowDrop,
     removeHightLightClassName,
   };
-}
+};
 
 export function getDirectionFormDropPosition(position: number) {
   if (position === -1) return 'top';

@@ -61,7 +61,6 @@ export function HtmlStringToReactNodes(
   const reactNode = (
     <RenderReactNode selector={'0'} node={doc.documentElement} index={0} />
   );
-
   return reactNode;
 }
 

@@ -1,18 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import mjml from 'mjml-browser';
 import { getPageIdx, IPage, JsonToMjml } from 'easy-email-core';
-import { cloneDeep, isEqual } from 'lodash';
-import { useEditorContext } from '@/hooks/useEditorContext';
+import { cloneDeep } from 'lodash';
 import { HtmlStringToReactNodes } from '@/utils/HtmlStringToReactNodes';
 import { createPortal } from 'react-dom';
 import { useEditorProps } from '@/hooks/useEditorProps';
 import { getEditorRoot, getShadowRoot } from '@/utils';
 import { DATA_RENDER_COUNT, FIXED_CONTAINER_ID } from '@/constants';
+import { store } from '@/store';
+import { observer, } from 'mobx-react-lite';
+import { autorun, toJS } from 'mobx';
 
 let count = 0;
-export function MjmlDomRender() {
-  const { pageData: content } = useEditorContext();
-  const [pageData, setPageData] = useState<IPage | null>(null);
+export const MjmlDomRender = observer(() => {
+
+  const [pageData, setPageData] = useState<IPage | null>(store.block.data.content);
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const { dashed, mergeTags, enabledMergeTagsBadge } = useEditorProps();
   const [isTextFocus, setIsTextFocus] = useState(false);
@@ -22,10 +24,19 @@ export function MjmlDomRender() {
     getShadowRoot().activeElement?.getAttribute('contenteditable') === 'true';
 
   useEffect(() => {
-    if (!isTextFocus && !isEqual(content, pageData)) {
-      setPageData(cloneDeep(content));
-    }
-  }, [content, pageData, setPageData, isTextFocus]);
+
+    const disposer = autorun(() => {
+      const content = store.block.data.content;
+      if (!isTextFocus) {
+        setPageData(cloneDeep(toJS(content)));
+      }
+    });
+
+    return () => {
+      disposer();
+    };
+
+  }, [isTextFocus]);
 
   useEffect(() => {
     setIsTextFocus(isTextFocusing);
@@ -68,17 +79,21 @@ export function MjmlDomRender() {
   }, []);
 
   const html = useMemo(() => {
+    const begin = +new Date();
     if (!pageData) return '';
 
+    const mjmlContent = JsonToMjml({
+      data: pageData,
+      idx: getPageIdx(),
+      context: pageData,
+      mode: 'testing',
+      dataSource: cloneDeep(mergeTags),
+    });
+    console.log('JsonToMjml', +new Date() - begin);
     const renderHtml = mjml(
-      JsonToMjml({
-        data: pageData,
-        idx: getPageIdx(),
-        context: pageData,
-        mode: 'testing',
-        dataSource: cloneDeep(mergeTags),
-      })
+      mjmlContent
     ).html;
+    console.log('renderHtml', +new Date() - begin);
     return renderHtml;
   }, [mergeTags, pageData]);
 
@@ -109,4 +124,4 @@ export function MjmlDomRender() {
       </div>
     );
   }, [dashed, ref, html, enabledMergeTagsBadge]);
-}
+});

@@ -1,15 +1,16 @@
 import { Stack } from '@/components/UI/Stack';
 import React from 'react';
-import { useBlock } from '@/hooks/useBlock';
 import { IconFont } from '@/components/IconFont';
 import { Button } from '@/components/UI/Button';
+import { store } from '@/store';
+import { observer } from 'mobx-react-lite';
 
-export function ToolsPanel() {
-  const { redo, undo, redoable, undoable } = useBlock();
+export const ToolsPanel = observer(() => {
+  const { redo, undo, redoable, undoable } = store.record;
 
   return (
     <Stack>
-      <Button title='undo' disabled={!undoable} onClick={undo}>
+      <Button title='undo' disabled={!undoable} onClick={() => undo()}>
         <IconFont
           iconName='icon-undo'
           style={{
@@ -19,7 +20,7 @@ export function ToolsPanel() {
         />
       </Button>
 
-      <Button title='redo' disabled={!redoable} onClick={redo}>
+      <Button title='redo' disabled={!redoable} onClick={() => redo()}>
         <IconFont
           iconName='icon-redo'
           style={{
@@ -31,4 +32,4 @@ export function ToolsPanel() {
       <Stack.Item />
     </Stack>
   );
-}
+});

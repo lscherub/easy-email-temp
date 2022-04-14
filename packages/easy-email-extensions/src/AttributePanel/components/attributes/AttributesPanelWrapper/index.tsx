@@ -1,27 +1,18 @@
 import { IconEye, IconEyeInvisible } from '@arco-design/web-react/icon';
 import React, { useCallback } from 'react';
 import { Stack, TextStyle, useBlock, useEditorProps } from 'easy-email-editor';
-import { MergeTags } from '../MergeTags';
-import { BasicType, BlockManager } from 'easy-email-core';
+import { observer } from 'mobx-react-lite';
+import { BasicType, BlockManager, IBlockData } from 'easy-email-core';
 
 export interface AttributesPanelWrapper {
   style?: React.CSSProperties;
   extra?: React.ReactNode;
 }
-export const AttributesPanelWrapper: React.FC<AttributesPanelWrapper> = (
+export const AttributesPanelWrapper: React.FC<AttributesPanelWrapper> = observer((
   props
 ) => {
   const { focusBlock, setFocusBlock } = useBlock();
   const block = focusBlock && BlockManager.getBlockByType(focusBlock.type);
-
-  const onChangeHidden = useCallback(
-    (val: string | boolean) => {
-      if (!focusBlock) return;
-      focusBlock.data.hidden = val as any;
-      setFocusBlock({ ...focusBlock });
-    },
-    [focusBlock, setFocusBlock]
-  );
 
   if (!focusBlock || !block) return null;
 
@@ -38,7 +29,7 @@ export const AttributesPanelWrapper: React.FC<AttributesPanelWrapper> = (
           <Stack.Item fill>
             <Stack wrap={false} distribution='equalSpacing' alignment='center'>
               <Stack spacing='extraTight' alignment='center'>
-                <EyeIcon />
+                <EyeIcon setFocusBlock={setFocusBlock} focusBlock={focusBlock} />
                 <TextStyle variation='strong' size='large'>
                   {`${block.name} attributes`}
                 </TextStyle>
@@ -52,10 +43,9 @@ export const AttributesPanelWrapper: React.FC<AttributesPanelWrapper> = (
       <div style={{ padding: '0px', ...props.style }}>{props.children}</div>
     </div>
   );
-};
+});
 
-function EyeIcon() {
-  const { setFocusBlock, focusBlock } = useBlock();
+function EyeIcon({ focusBlock, setFocusBlock }: { focusBlock: IBlockData; setFocusBlock: (blockData: IBlockData) => void; }) {
 
   const onToggleVisible = useCallback(
     (e: React.MouseEvent) => {

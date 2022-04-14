@@ -9,9 +9,10 @@ import {
   BlockAvatarWrapper,
   useFocusBlockLayout,
 } from 'easy-email-editor';
+import { observer } from 'mobx-react-lite';
 import { Toolbar } from './Toolbar';
 
-export function FocusTooltip() {
+export const FocusTooltip = observer(() => {
   const { focusBlock } = useBlock();
   const { focusIdx } = useFocusIdx();
   const { focusBlockNode } = useFocusBlockLayout();
@@ -116,4 +117,4 @@ export function FocusTooltip() {
       )}
     </>
   );
-}
+});

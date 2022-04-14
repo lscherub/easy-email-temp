@@ -3,15 +3,15 @@ import { Form, useForm, useFormState, useField } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
 import React, { useMemo } from 'react';
 import { BlocksProvider } from '..//BlocksProvider';
-import { HoverIdxProvider } from '../HoverIdxProvider';
 import { PropsProvider, PropsProviderProps } from '../PropsProvider';
-import { RecordProvider } from '../RecordProvider';
 import { ScrollProvider } from '../ScrollProvider';
 import { Config, FormApi, FormState } from 'final-form';
 import { useEffect, useState } from 'react';
 import setFieldTouched from 'final-form-set-field-touched';
 import { FocusBlockLayoutProvider } from '../FocusBlockLayoutProvider';
 import { PreviewEmailProvider } from '../PreviewEmailProvider';
+import { store } from '@/store';
+import { observer } from 'mobx-react-lite';
 
 export interface EmailEditorProviderProps<T extends IEmailTemplate = any>
   extends PropsProviderProps {
@@ -27,24 +27,27 @@ export interface EmailEditorProviderProps<T extends IEmailTemplate = any>
   >['validate'];
 }
 
-export const EmailEditorProvider = <T extends any>(
+export const EmailEditorProvider = observer(<T extends any>(
   props: EmailEditorProviderProps & T
 ) => {
   const { data, children, onSubmit = () => { }, validationSchema } = props;
 
-  const initialValues = useMemo(() => {
-    return {
+
+  useEffect(() => {
+    const initialValues = {
       subject: data.subject,
       subTitle: data.subTitle,
       content: data.content,
     };
-  }, [data]);
+    store.block.setData(initialValues);
+  }, []);
 
-  if (!initialValues.content) return null;
+
+  if (!store.block.initialized) return null;
 
   return (
     <Form<IEmailTemplate>
-      initialValues={initialValues}
+      initialValues={store.block.data}
       onSubmit={onSubmit}
       enableReinitialize
       validate={validationSchema}
@@ -55,17 +58,15 @@ export const EmailEditorProvider = <T extends any>(
         <>
           <PropsProvider {...props}>
             <PreviewEmailProvider>
-              <RecordProvider>
-                <BlocksProvider>
-                  <HoverIdxProvider>
-                    <ScrollProvider>
-                      <FocusBlockLayoutProvider>
-                        <FormWrapper children={children} />
-                      </FocusBlockLayoutProvider>
-                    </ScrollProvider>
-                  </HoverIdxProvider>
-                </BlocksProvider>
-              </RecordProvider>
+              <BlocksProvider>
+
+                <ScrollProvider>
+                  <FocusBlockLayoutProvider>
+                    <FormWrapper children={children} />
+                  </FocusBlockLayoutProvider>
+                </ScrollProvider>
+
+              </BlocksProvider>
             </PreviewEmailProvider>
 
           </PropsProvider>
@@ -74,7 +75,7 @@ export const EmailEditorProvider = <T extends any>(
       )}
     </Form>
   );
-};
+});
 
 function FormWrapper({
   children,

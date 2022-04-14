@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { BlockType, getChildIdx } from 'easy-email-core';
 import { useHoverIdx } from '@/hooks/useHoverIdx';
-import { useDataTransfer } from '@/hooks/useDataTransfer';
 import { isUndefined } from 'lodash';
 import { useBlock } from '@/hooks/useBlock';
+import { store } from '@/store';
+import { observer } from 'mobx-react-lite';
 
 export type BlockAvatarWrapperProps = {
   type: BlockType | string;
@@ -13,25 +14,25 @@ export type BlockAvatarWrapperProps = {
   idx?: string;
 };
 
-export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = (
+export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = observer((
   props
 ) => {
   const { type, children, payload, action = 'add', idx } = props;
-  const { addBlock, moveBlock, values } = useBlock();
+  const { addBlock, moveBlock } = useBlock();
   const { setIsDragging, setHoverIdx } = useHoverIdx();
-  const { setDataTransfer, dataTransfer } = useDataTransfer();
+
   const ref = useRef<HTMLDivElement>(null);
 
   const onDragStart = useCallback(
     (ev: React.DragEvent) => {
       if (action === 'add') {
-        setDataTransfer({
+        store.blockState.setDataTransfer({
           type: type,
           action,
           payload,
         });
       } else {
-        setDataTransfer({
+        store.blockState.setDataTransfer({
           type: type,
           action,
           sourceIdx: idx,
@@ -40,12 +41,13 @@ export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = (
 
       setIsDragging(true);
     },
-    [action, idx, payload, setDataTransfer, setIsDragging, type]
+    [action, idx, payload, setIsDragging, type]
   );
 
   const onDragEnd = useCallback(() => {
     setIsDragging(false);
     setHoverIdx('');
+    const { dataTransfer } = store.blockState;
     if (!dataTransfer) return;
     if (action === 'add' && !isUndefined(dataTransfer.parentIdx)) {
       addBlock({
@@ -67,17 +69,7 @@ export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = (
         );
       }
     }
-  }, [
-    action,
-    addBlock,
-    idx,
-    moveBlock,
-    dataTransfer,
-    payload,
-    setHoverIdx,
-    setIsDragging,
-    type,
-  ]);
+  }, [action, addBlock, idx, moveBlock, payload, setHoverIdx, setIsDragging, type]);
 
   useEffect(() => {
     const ele = ref.current;
@@ -103,4 +95,4 @@ export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = (
       {children}
     </div>
   );
-};
+});
