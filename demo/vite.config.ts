@@ -41,7 +41,6 @@ export default defineConfig({
       ),
     },
   },
-
   define: {},
   build: {
     minify: 'terser',
@@ -134,7 +133,7 @@ export default defineConfig({
 
         `
             : '',
-        buildTime: `<meta name="updated-time" content="${new Date().toUTCString()}" />`
+        buildTime: `<meta name="updated-time" content="${new Date().toUTCString()}" />`,
       },
     }),
   ].filter(Boolean),

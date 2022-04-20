@@ -7,8 +7,8 @@ import {
   useBlock,
   useEditorContext,
   useFocusIdx,
-  useHoverIdx,
   useRefState,
+  useStateHelper,
 } from 'easy-email-editor';
 import {
   BasicType,
@@ -47,12 +47,14 @@ export interface BlockLayerProps {
 }
 
 export function BlockLayer(props: BlockLayerProps) {
-  const { pageData } = useEditorContext();
+  const { pageData, values } = useEditorContext();
   const { renderTitle: propsRenderTitle } = props;
-  const { focusIdx, setFocusIdx } = useFocusIdx();
-  const { setHoverIdx, setIsDragging, setDirection } = useHoverIdx();
-  const { moveBlock, setValueByIdx, copyBlock, removeBlock, values } =
+  const { focusIdx, } = useFocusIdx();
+  const { setHoverIdx, setIsDragging, setDirection, setFocusIdx } = useStateHelper();
+
+  const { moveBlock, setValueByIdx, copyBlock, removeBlock } =
     useBlock();
+
 
   const { setBlockLayerRef, allowDrop, removeHightLightClassName } =
     useAvatarWrapperDrop();

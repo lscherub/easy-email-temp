@@ -9,13 +9,11 @@ import { DATA_ATTRIBUTE_DROP_CONTAINER, SYNC_SCROLL_ELEMENT_CLASS_NAME } from '@
 import { classnames } from '@/utils/classnames';
 import { ActiveTabKeys } from '@/components/Provider/BlocksProvider';
 import { useActiveTab } from '@/hooks/useActiveTab';
-import { store } from '@/store';
-import { observer } from 'mobx-react-lite';
 
-export const EditEmailPreview = observer(() => {
+export const EditEmailPreview = () => {
   useHotKeys();
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
-  const { setRef } = useDropBlock(store.block.data);
+  const { setRef } = useDropBlock();
   const { activeTab } = useActiveTab();
 
   const { setInitialized } = useEditorContext();
@@ -73,4 +71,4 @@ export const EditEmailPreview = observer(() => {
     ),
     [activeTab]
   );
-});
+};

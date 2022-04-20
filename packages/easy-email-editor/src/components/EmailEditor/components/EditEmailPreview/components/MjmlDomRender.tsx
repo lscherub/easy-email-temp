@@ -1,42 +1,36 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import mjml from 'mjml-browser';
 import { getPageIdx, IPage, JsonToMjml } from 'easy-email-core';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import { HtmlStringToReactNodes } from '@/utils/HtmlStringToReactNodes';
 import { createPortal } from 'react-dom';
 import { useEditorProps } from '@/hooks/useEditorProps';
 import { getEditorRoot, getShadowRoot } from '@/utils';
 import { DATA_RENDER_COUNT, FIXED_CONTAINER_ID } from '@/constants';
-import { store } from '@/store';
-import { observer, } from 'mobx-react-lite';
-import { autorun, toJS } from 'mobx';
+import { useEditorContext } from '@/hooks/useEditorContext';
+import { useLazyState } from '@/hooks/useLazyState';
 
 let count = 0;
-export const MjmlDomRender = observer(() => {
-
-  const [pageData, setPageData] = useState<IPage | null>(store.block.data.content);
+export const MjmlDomRender = () => {
+  const { pageData: sourcePageData } = useEditorContext();
+  const [pageData, setPageData] = useState<IPage | null>(sourcePageData);
+  const lazySourcePageData = useLazyState(sourcePageData, 100);
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const { dashed, mergeTags, enabledMergeTagsBadge } = useEditorProps();
   const [isTextFocus, setIsTextFocus] = useState(false);
-
   const isTextFocusing =
     document.activeElement === getEditorRoot() &&
     getShadowRoot().activeElement?.getAttribute('contenteditable') === 'true';
 
   useEffect(() => {
 
-    const disposer = autorun(() => {
-      const content = store.block.data.content;
-      if (!isTextFocus) {
-        setPageData(cloneDeep(toJS(content)));
+    if (!isTextFocus) {
+      if (!isEqual(lazySourcePageData, pageData)) {
+        setPageData(cloneDeep(lazySourcePageData));
       }
-    });
+    }
 
-    return () => {
-      disposer();
-    };
-
-  }, [isTextFocus]);
+  }, [lazySourcePageData, pageData, isTextFocus]);
 
   useEffect(() => {
     setIsTextFocus(isTextFocusing);
@@ -82,14 +76,17 @@ export const MjmlDomRender = observer(() => {
     const begin = +new Date();
     if (!pageData) return '';
 
+    // 防止被意外修改，导致diff失效
+    const clonePageData = cloneDeep(pageData);
+
     const mjmlContent = JsonToMjml({
-      data: pageData,
+      data: clonePageData,
       idx: getPageIdx(),
-      context: pageData,
+      context: clonePageData,
       mode: 'testing',
       dataSource: cloneDeep(mergeTags),
     });
-    console.log('JsonToMjml', +new Date() - begin);
+
     const renderHtml = mjml(
       mjmlContent
     ).html;
@@ -124,4 +121,4 @@ export const MjmlDomRender = observer(() => {
       </div>
     );
   }, [dashed, ref, html, enabledMergeTagsBadge]);
-});
+};

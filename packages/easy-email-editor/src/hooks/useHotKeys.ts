@@ -1,3 +1,4 @@
+import { useRecord } from '@/hooks/useRecord';
 import { useEffect } from 'react';
 import isHotkey from 'is-hotkey';
 import { useBlock } from './useBlock';
@@ -6,6 +7,7 @@ import { useFocusIdx } from './useFocusIdx';
 import { useEditorContext } from './useEditorContext';
 import { getNodeIdxFromClassName } from 'easy-email-core';
 import { getBlockNodeByChildEle } from '@/utils/getBlockNodeByChildEle';
+import { useStateHelper } from './useStateHelper';
 
 function isContentEditFocus() {
   const isShadowRootFocus = document.activeElement === getEditorRoot();
@@ -31,13 +33,12 @@ function isContentEditFocus() {
 }
 
 export function useHotKeys() {
-  const { redo, undo, removeBlock } = useBlock();
-  const { focusIdx, setFocusIdx } = useFocusIdx();
-  const {
-    formState: { values },
-  } = useEditorContext();
+  const { removeBlock } = useBlock();
+  const { focusIdx } = useFocusIdx();
+  const { setFocusIdx } = useStateHelper();
+  const { values } = useEditorContext();
+  const { undo, redo } = useRecord();
 
-  const root = getShadowRoot();
   // redo/undo
   useEffect(() => {
     const onKeyDown = (ev: KeyboardEvent) => {
@@ -56,7 +57,7 @@ export function useHotKeys() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [redo, undo]);
+  }, []);
 
   // delete
   useEffect(() => {

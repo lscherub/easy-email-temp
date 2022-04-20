@@ -283,7 +283,7 @@ export default function Editor() {
         mergeTagGenerate={(tag) => `{{${tag}}}`}
         onBeforePreview={onBeforePreview}
       >
-        {({ values }, { submit }) => {
+        {() => {
           return (
             <>
               <PageHeader
@@ -310,7 +310,7 @@ export default function Editor() {
                     <Button onClick={openMergeTagsModal}>
                       Update mergeTags
                     </Button>
-
+                    {/*
                     <Button onClick={() => onExportMJML(values)}>
                       Export MJML
                     </Button>
@@ -328,7 +328,7 @@ export default function Editor() {
                       onClick={() => submit()}
                     >
                       Save
-                    </Button>
+                    </Button> */}
                     <a
                       target='_blank'
                       href='https://github.com/m-Ryan/easy-email'
@@ -353,7 +353,7 @@ export default function Editor() {
               <SimpleLayout>
                 <EmailEditor />
               </SimpleLayout>
-              <AutoSaveAndRestoreEmail />
+              {/* <AutoSaveAndRestoreEmail /> */}
             </>
           );
         }}

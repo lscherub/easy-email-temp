@@ -2,11 +2,10 @@ import { Stack } from '@/components/UI/Stack';
 import React from 'react';
 import { IconFont } from '@/components/IconFont';
 import { Button } from '@/components/UI/Button';
-import { store } from '@/store';
-import { observer } from 'mobx-react-lite';
+import { useRecord } from '@/hooks/useRecord';
 
-export const ToolsPanel = observer(() => {
-  const { redo, undo, redoable, undoable } = store.record;
+export const ToolsPanel = () => {
+  const { redo, undo, redoable, undoable } = useRecord();
 
   return (
     <Stack>
@@ -32,4 +31,4 @@ export const ToolsPanel = observer(() => {
       <Stack.Item />
     </Stack>
   );
-});
+};

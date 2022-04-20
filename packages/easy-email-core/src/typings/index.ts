@@ -6,13 +6,20 @@ export interface IBlock<T extends IBlockData = IBlockData> {
   type: string;
   create: (payload?: RecursivePartial<T>) => T;
   validParentType: string[];
-  render?: (
-    data: T,
-    idx: string | null,
-    mode: 'testing' | 'production',
-    context?: IPage,
-    dataSource?: { [key: string]: any }
-  ) => IBlockData | ReactElement | null;
+  render: (params: {
+    data: T;
+    idx?: string | null;
+    mode: 'testing' | 'production';
+    context?: IPage;
+    dataSource?: { [key: string]: any };
+    children?: React.ReactNode;
+    keepClassName?: boolean;
+    renderPortal?: (
+      props: Omit<Parameters<IBlock<T>['render']>[0], 'renderPortal'> & {
+        refEle: HTMLElement;
+      }
+    ) => React.ReactNode;
+  }) => React.ReactNode;
 }
 
 export interface IBlockData<

@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { BlockType, getChildIdx } from 'easy-email-core';
-import { useHoverIdx } from '@/hooks/useHoverIdx';
 import { isUndefined } from 'lodash';
 import { useBlock } from '@/hooks/useBlock';
 import { store } from '@/store';
-import { observer } from 'mobx-react-lite';
+import { useStateHelper } from '@/hooks/useStateHelper';
 
 export type BlockAvatarWrapperProps = {
   type: BlockType | string;
@@ -14,12 +13,12 @@ export type BlockAvatarWrapperProps = {
   idx?: string;
 };
 
-export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = observer((
+export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = (
   props
 ) => {
   const { type, children, payload, action = 'add', idx } = props;
   const { addBlock, moveBlock } = useBlock();
-  const { setIsDragging, setHoverIdx } = useHoverIdx();
+  const { setIsDragging, setHoverIdx } = useStateHelper();
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -95,4 +94,4 @@ export const BlockAvatarWrapper: React.FC<BlockAvatarWrapperProps> = observer((
       {children}
     </div>
   );
-});
+};

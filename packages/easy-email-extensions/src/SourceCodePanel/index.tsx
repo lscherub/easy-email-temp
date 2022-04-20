@@ -18,7 +18,8 @@ import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 export function SourceCodePanel() {
-  const { setValueByIdx, focusBlock, values } = useBlock();
+  const { setValueByIdx, focusBlock } = useBlock();
+  const { formState: { values } } = useEditorContext();
   const { focusIdx } = useFocusIdx();
 
   const [mjmlText, setMjmlText] = useState('');

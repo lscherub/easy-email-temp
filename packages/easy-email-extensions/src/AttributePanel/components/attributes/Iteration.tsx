@@ -1,4 +1,4 @@
-import { useBlock, useFocusIdx } from 'easy-email-editor';
+import { useBlock, useEditorContext, useFocusIdx } from 'easy-email-editor';
 import { Collapse, Grid, Switch } from '@arco-design/web-react';
 import { AdvancedBlock, AdvancedType } from 'easy-email-core';
 import { TextField } from '@extensions/components/Form';
@@ -6,7 +6,8 @@ import React, { useCallback } from 'react';
 
 export function Iteration() {
   const { focusIdx } = useFocusIdx();
-  const { focusBlock, change } = useBlock();
+  const { focusBlock } = useBlock();
+  const { formHelpers: { change } } = useEditorContext();
   const iteration = focusBlock?.data.value?.iteration as
     | undefined
     | AdvancedBlock['data']['value']['iteration'];

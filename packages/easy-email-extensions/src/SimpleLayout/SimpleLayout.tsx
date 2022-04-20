@@ -2,8 +2,6 @@ import { ShortcutToolbar } from '../ShortcutToolbar';
 import { Button, Card, ConfigProvider, Layout, Tabs } from '@arco-design/web-react';
 import { useEditorProps } from 'easy-email-editor';
 import React, { useState } from 'react';
-import { SourceCodePanel } from '../SourceCodePanel';
-import { AttributePanel } from '../AttributePanel';
 import { BlockLayer, BlockLayerProps } from '../BlockLayer';
 import { InteractivePrompt } from '../InteractivePrompt';
 import styles from './index.module.scss';
@@ -52,7 +50,7 @@ export const SimpleLayout: React.FC<
                 onClick={() => setCollapsed(v => !v)}
               />
             </Card.Grid>
-            {/* <Card.Grid
+            <Card.Grid
               className={styles.customScrollBar}
               style={{
                 flex: 1,
@@ -68,14 +66,14 @@ export const SimpleLayout: React.FC<
                   <BlockLayer renderTitle={props.renderTitle} />
                 )}
               </Card>
-            </Card.Grid> */}
+            </Card.Grid>
 
           </Card>
         </Layout.Sider>
 
         <Layout style={{ height: containerHeight }}>{props.children}</Layout>
 
-        {/* <Layout.Sider
+        <Layout.Sider
           style={{
             height: containerHeight,
             minWidth: 300,
@@ -95,7 +93,7 @@ export const SimpleLayout: React.FC<
             bodyStyle={{ padding: 0 }}
             className={styles.customScrollBarV2}
           >
-            <Tabs className={styles.layoutTabs}>
+            {/* <Tabs className={styles.layoutTabs}>
               <Tabs.TabPane title={<div style={{ height: 31, lineHeight: '31px' }}>Configuration</div>}>
                 <AttributePanel />
               </Tabs.TabPane>
@@ -104,9 +102,9 @@ export const SimpleLayout: React.FC<
                   <SourceCodePanel />
                 </Tabs.TabPane>
               )}
-            </Tabs>
+            </Tabs> */}
           </Card>
-        </Layout.Sider> */}
+        </Layout.Sider>
 
         <InteractivePrompt />
         <MergeTagBadgePrompt />

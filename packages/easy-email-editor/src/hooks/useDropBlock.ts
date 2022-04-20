@@ -1,17 +1,19 @@
+import { useFocusIdx } from '@/hooks/useFocusIdx';
+import { useHoverIdx } from '@/hooks/useHoverIdx';
+import { useEditorContext } from '@/hooks/useEditorContext';
 import { useEffect, useMemo, useState, useRef } from 'react';
 
 import { getNodeIdxFromClassName } from 'easy-email-core';
 import { getBlockNodeByChildEle } from '@/utils/getBlockNodeByChildEle';
 import { getDirectionPosition } from '@/utils/getDirectionPosition';
-import { useFocusIdx } from './useFocusIdx';
-import { useHoverIdx } from './useHoverIdx';
 import { getInsertPosition } from '@/utils/getInsertPosition';
 import { useEditorProps } from './useEditorProps';
 import { DATA_ATTRIBUTE_DROP_CONTAINER } from '@/constants';
 import { store } from '@/store';
-import { IEmailTemplate } from '@/typings';
+import { useStateHelper } from './useStateHelper';
 
-export function useDropBlock(values: IEmailTemplate) {
+export function useDropBlock() {
+  const { values } = useEditorContext();
   const [ref, setRef] = useState<HTMLElement | null>(null);
   const { autoComplete } = useEditorProps();
   const cacheValues = useRef(values);
@@ -20,9 +22,11 @@ export function useDropBlock(values: IEmailTemplate) {
     cacheValues.current = values;
   }, [values]);
 
-  const { setFocusIdx, focusIdx } = useFocusIdx();
-  const { setHoverIdx, setDirection, isDragging, hoverIdx, direction } =
-    useHoverIdx();
+  const { setHoverIdx, setDirection, setFocusIdx } = useStateHelper();
+
+  const { isDragging, hoverIdx, direction } = useHoverIdx();
+
+  const { focusIdx } = useFocusIdx();
 
   useEffect(() => {
     if (ref) {

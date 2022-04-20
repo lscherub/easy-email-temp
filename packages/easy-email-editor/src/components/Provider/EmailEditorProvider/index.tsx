@@ -1,7 +1,7 @@
 import { IEmailTemplate } from '@/typings';
 import { Form, useForm, useFormState, useField } from 'react-final-form';
 import arrayMutators from 'final-form-arrays';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { BlocksProvider } from '..//BlocksProvider';
 import { PropsProvider, PropsProviderProps } from '../PropsProvider';
 import { ScrollProvider } from '../ScrollProvider';
@@ -12,6 +12,7 @@ import { FocusBlockLayoutProvider } from '../FocusBlockLayoutProvider';
 import { PreviewEmailProvider } from '../PreviewEmailProvider';
 import { store } from '@/store';
 import { observer } from 'mobx-react-lite';
+import { toJS } from 'mobx';
 
 export interface EmailEditorProviderProps<T extends IEmailTemplate = any>
   extends PropsProviderProps {
@@ -45,9 +46,24 @@ export const EmailEditorProvider = observer(<T extends any>(
 
   if (!store.block.initialized) return null;
 
+  return <PropsProvider {...props}>
+
+    <BlocksProvider>
+      <PreviewEmailProvider>
+        <ScrollProvider>
+          <FocusBlockLayoutProvider>
+            {children()}
+          </FocusBlockLayoutProvider>
+        </ScrollProvider>
+      </PreviewEmailProvider>
+    </BlocksProvider>
+
+
+  </PropsProvider>;
+
   return (
     <Form<IEmailTemplate>
-      initialValues={store.block.data}
+      initialValues={toJS(store.block.data)}
       onSubmit={onSubmit}
       enableReinitialize
       validate={validationSchema}

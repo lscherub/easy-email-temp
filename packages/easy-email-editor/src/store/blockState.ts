@@ -10,8 +10,7 @@ export interface DataTransfer {
   sourceIdx?: string;
 }
 
-export const blockState = new class {
-
+export const blockState = new (class {
   constructor() {
     makeAutoObservable(this);
   }
@@ -45,4 +44,4 @@ export const blockState = new class {
   setDataTransfer = (dataTransfer: DataTransfer | null) => {
     this.dataTransfer = dataTransfer;
   };
-};
+})();

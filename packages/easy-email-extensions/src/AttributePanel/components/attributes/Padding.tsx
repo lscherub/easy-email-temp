@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { InputWithUnitField, TextField } from '../../../components/Form';
-import { useFocusIdx, Stack, useBlock, TextStyle } from 'easy-email-editor';
+import { InputWithUnitField } from '../../../components/Form';
+import { useFocusIdx, Stack, useBlock, TextStyle, useEditorContext } from 'easy-email-editor';
 import { createBlockDataByType } from 'easy-email-core';
 import { Form, useFormState } from 'react-final-form';
 import { Grid } from '@arco-design/web-react';
@@ -13,7 +13,8 @@ export interface PaddingProps {
 }
 export function Padding(props: PaddingProps = {}) {
   const { title = 'Padding', attributeName = 'padding', name } = props;
-  const { focusBlock, change, values } = useBlock();
+  const { focusBlock } = useBlock();
+  const { formHelpers: { change }, formState: { values } } = useEditorContext();
   const { focusIdx } = useFocusIdx();
 
   const type = focusBlock && focusBlock.type;

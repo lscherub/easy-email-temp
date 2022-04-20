@@ -1,20 +1,8 @@
 import { store } from '@/store';
-import { autorun } from 'mobx';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useObserver } from 'mobx-react-lite';
 
 export function useFocusIdx() {
-  const [focusIdx, setFocusIdx] = useState(store.blockState.focusIdx);
-
-  useEffect(() => {
-    const disposer = autorun(() => {
-      setFocusIdx(store.blockState.focusIdx);
-    });
-    return disposer;
-  }, []);
-
-  return {
-    focusIdx,
-    setFocusIdx: store.blockState.setFocusIdx,
-  };
+  return useObserver(() => ({
+    focusIdx: store.blockState.focusIdx,
+  }));
 }

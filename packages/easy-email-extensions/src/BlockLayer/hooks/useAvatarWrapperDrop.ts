@@ -5,7 +5,6 @@ import {
   getDirectionPosition,
   store,
   useEditorContext,
-  useHoverIdx,
   useRefState,
 } from 'easy-email-editor';
 
@@ -17,10 +16,8 @@ import { BlockTreeProps } from '../components/BlockTree';
 export const useAvatarWrapperDrop = () => {
   const [blockLayerRef, setBlockLayerRef] = useState<HTMLElement | null>(null);
 
-  const { setHoverIdx, setDirection } = useHoverIdx();
-  const {
-    formState: { values },
-  } = useEditorContext();
+  const { setHoverIdx, setDirection } = useStateHelper();
+  const { values } = useEditorContext();
 
   const valuesRef = useRefState(values);
 
@@ -203,7 +200,14 @@ export const useAvatarWrapperDrop = () => {
         blockLayerRef.removeEventListener('dragleave', onDragend);
       };
     }
-  }, [blockLayerRef, valuesRef, removeHightLightClassName, allowDrop, setDirection, setHoverIdx]);
+  }, [
+    blockLayerRef,
+    valuesRef,
+    removeHightLightClassName,
+    allowDrop,
+    setDirection,
+    setHoverIdx,
+  ]);
 
   return {
     setBlockLayerRef,
@@ -217,4 +221,7 @@ export function getDirectionFormDropPosition(position: number) {
   if (position === -1) return 'top';
   if (position === 1) return 'bottom';
   return '';
+}
+function useStateHelper(): { setHoverIdx: any; setDirection: any } {
+  throw new Error('Function not implemented.');
 }

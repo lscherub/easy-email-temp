@@ -1,4 +1,4 @@
-import { BasicType, getNodeIdxFromClassName } from 'easy-email-core';
+import { BasicType, getNodeIdxFromClassName, getNodeTypeClassName } from 'easy-email-core';
 import { camelCase } from 'lodash';
 import React from 'react';
 import {
@@ -49,7 +49,7 @@ export function HtmlStringToReactNodes(
   [...doc.getElementsByTagName('a')].forEach((node) => {
     node.setAttribute('tabIndex', '-1');
   });
-  [...doc.querySelectorAll(`.${MERGE_TAG_CLASS_NAME}`)].forEach((child) => {
+  [...doc.querySelectorAll(`.${getNodeTypeClassName(BasicType.TEXT)}`)].forEach((child) => {
     const editNode = child.querySelector('div');
     if (editNode) {
       if (option.enabledMergeTagsBadge) {

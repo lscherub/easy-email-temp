@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Tree, TreeSelect } from '@arco-design/web-react';
 import { get, isObject } from 'lodash';
-import { useBlock, useEditorProps, useFocusIdx } from 'easy-email-editor';
+import { useEditorContext, useEditorProps, useFocusIdx } from 'easy-email-editor';
 import { getContextMergeTags } from '@extensions/utils/getContextMergeTags';
 
 export const MergeTags: React.FC<{
@@ -16,7 +16,8 @@ export const MergeTags: React.FC<{
     mergeTagGenerate,
     renderMergeTagContent,
   } = useEditorProps();
-  const { values } = useBlock();
+
+  const { formState: { values } } = useEditorContext();
 
   const contextMergeTags = useMemo(
     () => getContextMergeTags(mergeTags, values, focusIdx),
@@ -33,7 +34,7 @@ export const MergeTags: React.FC<{
     const deep = (
       key: string,
       title: string,
-      parent: { [key: string]: any; children?: any[] },
+      parent: { [key: string]: any; children?: any[]; },
       mapData: Array<any> = []
     ) => {
       const currentMapData = {

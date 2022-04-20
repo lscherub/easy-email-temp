@@ -1,4 +1,4 @@
-import { useBlock, useFocusIdx } from 'easy-email-editor';
+import { useBlock, useEditorContext, useFocusIdx } from 'easy-email-editor';
 import { AdvancedBlock, OperatorSymbol, AdvancedType, Operator, ICondition, IConditionGroup } from 'easy-email-core';
 import { Collapse, Grid, Switch, Button, Space, List, Message } from '@arco-design/web-react';
 import { SelectField, TextField } from '@extensions/components/Form';
@@ -9,7 +9,8 @@ import { useField } from 'react-final-form';
 
 export function Condition() {
   const { focusIdx } = useFocusIdx();
-  const { focusBlock, change, values } = useBlock();
+  const { focusBlock } = useBlock();
+  const { formHelpers: { change }, formState: { values } } = useEditorContext();
   const condition = focusBlock?.data.value?.condition as
     | undefined
     | AdvancedBlock['data']['value']['condition'];

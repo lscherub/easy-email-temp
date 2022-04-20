@@ -1,8 +1,12 @@
-import { EventManager } from '@';
+import { EventManager } from '@/utils';
+import { store } from '@/store';
 import { EventType } from '@/utils/EventManager';
 import { isFunction } from 'lodash';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCallback } from 'react';
+import { autorun, toJS } from 'mobx';
+import { IEmailTemplate } from '@/typings';
+import { observer } from 'mobx-react-lite';
 
 export enum ActiveTabKeys {
   EDIT = 'EDIT',
@@ -18,20 +22,26 @@ export const BlocksContext = React.createContext<{
   setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
   activeTab: ActiveTabKeys;
   setActiveTab: React.Dispatch<React.SetStateAction<ActiveTabKeys>>;
-}>({
-  initialized: false,
-  setInitialized: () => { },
-  collapsed: false,
-  setCollapsed: () => { },
-  activeTab: ActiveTabKeys.EDIT,
-  setActiveTab: () => { },
-});
+  values: IEmailTemplate;
+}>({} as any);
 
-export const BlocksProvider: React.FC<{}> = (props) => {
-  const [dragEnabled, setDragEnabled] = useState(false);
+export const BlocksProvider: React.FC<{}> = observer((props) => {
+
   const [initialized, setInitialized] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [activeTab, setActiveTab] = useState(ActiveTabKeys.EDIT);
+
+  const [values, setValues] = useState(store.block.data);
+
+  useEffect(() => {
+    const disposer = autorun(() => {
+      setValues(toJS(store.block.data));
+    });
+
+    return () => {
+      disposer();
+    };
+  }, []);
 
   const onChangeTab: React.Dispatch<React.SetStateAction<ActiveTabKeys>> = useCallback((handler) => {
     if (isFunction(handler)) {
@@ -59,9 +69,10 @@ export const BlocksProvider: React.FC<{}> = (props) => {
         setCollapsed,
         activeTab,
         setActiveTab: onChangeTab,
+        values
       }}
     >
       {props.children}
     </BlocksContext.Provider>
   );
-};
+});

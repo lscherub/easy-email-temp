@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { InputWithUnitField } from '../../../components/Form';
-import { useFocusIdx, useBlock } from 'easy-email-editor';
+import { useFocusIdx, useBlock, useEditorContext } from 'easy-email-editor';
 import { BasicType, getParentByIdx } from 'easy-email-core';
 import { InputWithUnitProps } from '@extensions/components/Form/InputWithUnit';
 
@@ -12,7 +12,8 @@ export function Width({
   unitOptions?: InputWithUnitProps['unitOptions'];
 }) {
   const { focusIdx } = useFocusIdx();
-  const { focusBlock, values } = useBlock();
+  const { focusBlock } = useBlock();
+  const { formState: { values } } = useEditorContext();
   const parentType = getParentByIdx(values, focusIdx)?.type;
 
   const validate = useCallback(
