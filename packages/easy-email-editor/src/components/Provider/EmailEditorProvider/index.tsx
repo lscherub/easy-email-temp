@@ -46,21 +46,6 @@ export const EmailEditorProvider = observer(<T extends any>(
 
   if (!store.block.initialized) return null;
 
-  return <PropsProvider {...props}>
-
-    <BlocksProvider>
-      <PreviewEmailProvider>
-        <ScrollProvider>
-          <FocusBlockLayoutProvider>
-            {children()}
-          </FocusBlockLayoutProvider>
-        </ScrollProvider>
-      </PreviewEmailProvider>
-    </BlocksProvider>
-
-
-  </PropsProvider>;
-
   return (
     <Form<IEmailTemplate>
       initialValues={toJS(store.block.data)}
@@ -72,9 +57,10 @@ export const EmailEditorProvider = observer(<T extends any>(
     >
       {() => (
         <>
-          <PropsProvider {...props}>
-            <PreviewEmailProvider>
-              <BlocksProvider>
+          <BlocksProvider>
+            <PropsProvider {...props}>
+              <PreviewEmailProvider>
+
 
                 <ScrollProvider>
                   <FocusBlockLayoutProvider>
@@ -82,10 +68,11 @@ export const EmailEditorProvider = observer(<T extends any>(
                   </FocusBlockLayoutProvider>
                 </ScrollProvider>
 
-              </BlocksProvider>
-            </PreviewEmailProvider>
 
-          </PropsProvider>
+              </PreviewEmailProvider>
+
+            </PropsProvider>
+          </BlocksProvider>
           <RegisterFields />
         </>
       )}

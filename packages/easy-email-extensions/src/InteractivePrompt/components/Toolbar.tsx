@@ -5,6 +5,7 @@ import {
   useFocusIdx,
   useEditorProps,
   isTextBlock,
+  useStateHelper,
 } from 'easy-email-editor';
 import { classnames } from '@extensions/utils/classnames';
 import { useAddToCollection } from '@extensions/hooks/useAddToCollection';
@@ -12,7 +13,8 @@ import { getBlockTitle } from '@extensions/utils/getBlockTitle';
 
 export function Toolbar() {
   const { moveBlock, copyBlock, removeBlock, focusBlock } = useBlock();
-  const { focusIdx, setFocusIdx } = useFocusIdx();
+  const { focusIdx } = useFocusIdx();
+  const { setFocusIdx } = useStateHelper();
   const { modal, setModalVisible } = useAddToCollection();
   const props = useEditorProps();
 

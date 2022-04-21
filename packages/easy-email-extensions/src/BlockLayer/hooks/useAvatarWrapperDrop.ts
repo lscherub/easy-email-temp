@@ -6,6 +6,7 @@ import {
   store,
   useEditorContext,
   useRefState,
+  useStateHelper,
 } from 'easy-email-editor';
 
 import { BlockManager, getNodeIdxFromClassName } from 'easy-email-core';
@@ -221,7 +222,4 @@ export function getDirectionFormDropPosition(position: number) {
   if (position === -1) return 'top';
   if (position === 1) return 'bottom';
   return '';
-}
-function useStateHelper(): { setHoverIdx: any; setDirection: any } {
-  throw new Error('Function not implemented.');
 }

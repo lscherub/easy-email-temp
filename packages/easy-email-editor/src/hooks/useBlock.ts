@@ -16,11 +16,15 @@ import { IEmailTemplate } from '@/typings';
 import { useEditorProps } from './useEditorProps';
 import { scrollBlockEleIntoView } from '@/utils';
 import { store } from '@/store';
+import { useEditorContext } from './useEditorContext';
+import { useFocusIdx } from './useFocusIdx';
 
 export function useBlock() {
   const { autoComplete } = useEditorProps();
+  const { values } = useEditorContext();
+  const { focusIdx } = useFocusIdx();
 
-  const focusBlock = get(store.block.data, store.blockState.focusIdx);
+  const focusBlock = get(values, focusIdx);
 
   const addBlock = useCallback(
     (params: {

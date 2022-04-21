@@ -64,7 +64,7 @@ export default function enhancer<P, C extends (...rest: any[]) => any = any>(
         (val) => {
           onChange(val);
         },
-        500,
+        200,
         {
           // maxWait: 500,
         }

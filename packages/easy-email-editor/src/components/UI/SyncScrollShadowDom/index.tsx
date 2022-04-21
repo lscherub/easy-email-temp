@@ -1,4 +1,4 @@
-import { SYNC_SCROLL_ELEMENT_CLASS_NAME, useActiveTab } from '@';
+import { SYNC_SCROLL_ELEMENT_CLASS_NAME } from '@/constants';
 import { useDomScrollHeight } from '@/hooks/useDomScrollHeight';
 import { debounce } from 'lodash';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -11,12 +11,10 @@ export const SyncScrollShadowDom: React.FC<React.HTMLProps<HTMLElement> & { isAc
   const [root, setRoot] = useState<null | ShadowRoot>(null);
   const [ref, setRef] = useState<null | HTMLDivElement>(null);
   const { viewElementRef } = useDomScrollHeight();
-  const { activeTab } = useActiveTab();
   const { isActive, ...rest } = props;
 
   const setFirstVisibleEle = useCallback(debounce((root: HTMLElement) => {
     if (!root.shadowRoot) return;
-
     const { left, width, top: containerTop } = root.getBoundingClientRect();
 
     const ele = root.shadowRoot.elementFromPoint(left + width / 2, containerTop + offsetTop);
@@ -34,6 +32,7 @@ export const SyncScrollShadowDom: React.FC<React.HTMLProps<HTMLElement> & { isAc
     const selectorNode = ele && findSelectorNode(ele);
 
     viewElementRef.current = null;
+
     if (selectorNode) {
       const { top: selectorEleTop } = selectorNode.getBoundingClientRect();
 
@@ -57,21 +56,20 @@ export const SyncScrollShadowDom: React.FC<React.HTMLProps<HTMLElement> & { isAc
     const viewElement = viewElementRef.current;
     const scrollEle = root.querySelector(`.${SYNC_SCROLL_ELEMENT_CLASS_NAME}`);
     if (!scrollEle) return;
-
     if (viewElement) {
+
       const viewElementNode = root.querySelector(`[data-selector="${viewElement?.selector}"]`);
 
       if (viewElementNode && scrollEle) {
 
         viewElementNode.scrollIntoView();
-
         scrollEle.scrollTo(0, scrollEle.scrollTop - viewElement.top);
       }
     } else {
 
       scrollEle.scrollTo(0, 0);
     }
-  }, [root, viewElementRef, activeTab, isActive]);
+  }, [root, viewElementRef, isActive]);
 
   useEffect(() => {
     if (ref) {

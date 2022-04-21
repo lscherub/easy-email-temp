@@ -1,12 +1,10 @@
 import { EventManager } from '@/utils';
-import { store } from '@/store';
 import { EventType } from '@/utils/EventManager';
 import { isFunction } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useCallback } from 'react';
-import { autorun, toJS } from 'mobx';
 import { IEmailTemplate } from '@/typings';
-import { observer } from 'mobx-react-lite';
+import { useFormState } from 'react-final-form';
 
 export enum ActiveTabKeys {
   EDIT = 'EDIT',
@@ -25,23 +23,13 @@ export const BlocksContext = React.createContext<{
   values: IEmailTemplate;
 }>({} as any);
 
-export const BlocksProvider: React.FC<{}> = observer((props) => {
+export const BlocksProvider: React.FC<{}> = (props) => {
 
   const [initialized, setInitialized] = useState(false);
   const [collapsed, setCollapsed] = useState(true);
   const [activeTab, setActiveTab] = useState(ActiveTabKeys.EDIT);
 
-  const [values, setValues] = useState(store.block.data);
-
-  useEffect(() => {
-    const disposer = autorun(() => {
-      setValues(toJS(store.block.data));
-    });
-
-    return () => {
-      disposer();
-    };
-  }, []);
+  const { values } = useFormState<IEmailTemplate>();
 
   const onChangeTab: React.Dispatch<React.SetStateAction<ActiveTabKeys>> = useCallback((handler) => {
     if (isFunction(handler)) {
@@ -75,4 +63,4 @@ export const BlocksProvider: React.FC<{}> = observer((props) => {
       {props.children}
     </BlocksContext.Provider>
   );
-});
+};

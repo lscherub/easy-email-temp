@@ -1,4 +1,4 @@
-import { IconFont, useBlock, useEditorProps, useFocusIdx } from 'easy-email-editor';
+import { IconFont, useBlock, useEditorProps, useFocusIdx, useStateHelper } from 'easy-email-editor';
 import { useAddToCollection } from '@extensions/hooks/useAddToCollection';
 import { getParentIdx } from 'easy-email-core';
 import React from 'react';
@@ -6,7 +6,8 @@ import { ToolItem } from './ToolItem';
 
 export function BasicTools() {
   const { copyBlock, removeBlock } = useBlock();
-  const { focusIdx, setFocusIdx } = useFocusIdx();
+  const { focusIdx } = useFocusIdx();
+  const { setFocusIdx } = useStateHelper();
   const { modal, setModalVisible } = useAddToCollection();
   const { onAddCollection } = useEditorProps();
 

@@ -15,6 +15,7 @@ export function DesktopEmailPreview() {
     >
       <PreviewEmail
         isActive={activeTab === ActiveTabKeys.PC}
+
         style={{
           paddingLeft: 10,
           paddingRight: 10,

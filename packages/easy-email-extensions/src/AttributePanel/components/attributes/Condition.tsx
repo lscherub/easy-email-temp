@@ -1,16 +1,17 @@
-import { useBlock, useEditorContext, useFocusIdx } from 'easy-email-editor';
+import { IEmailTemplate, useBlock, useEditorContext, useFocusIdx } from 'easy-email-editor';
 import { AdvancedBlock, OperatorSymbol, AdvancedType, Operator, ICondition, IConditionGroup } from 'easy-email-core';
 import { Collapse, Grid, Switch, Button, Space, List, Message } from '@arco-design/web-react';
 import { SelectField, TextField } from '@extensions/components/Form';
 import React, { useCallback } from 'react';
 import { cloneDeep, get, upperFirst } from 'lodash';
 import { IconDelete, IconPlus } from '@arco-design/web-react/icon';
-import { useField } from 'react-final-form';
+import { useField, useForm, useFormState } from 'react-final-form';
 
 export function Condition() {
   const { focusIdx } = useFocusIdx();
   const { focusBlock } = useBlock();
-  const { formHelpers: { change }, formState: { values } } = useEditorContext();
+  const { values } = useFormState<IEmailTemplate>();
+  const { change } = useForm();
   const condition = focusBlock?.data.value?.condition as
     | undefined
     | AdvancedBlock['data']['value']['condition'];

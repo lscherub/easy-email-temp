@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Tree, TreeSelect } from '@arco-design/web-react';
 import { get, isObject } from 'lodash';
-import { useEditorContext, useEditorProps, useFocusIdx } from 'easy-email-editor';
+import { IEmailTemplate, useEditorProps, useFocusIdx } from 'easy-email-editor';
 import { getContextMergeTags } from '@extensions/utils/getContextMergeTags';
+import { useFormState } from 'react-final-form';
 
 export const MergeTags: React.FC<{
   onChange: (v: string) => void;
@@ -17,7 +18,7 @@ export const MergeTags: React.FC<{
     renderMergeTagContent,
   } = useEditorProps();
 
-  const { formState: { values } } = useEditorContext();
+  const { values } = useFormState<IEmailTemplate>();
 
   const contextMergeTags = useMemo(
     () => getContextMergeTags(mergeTags, values, focusIdx),

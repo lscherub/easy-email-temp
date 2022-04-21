@@ -14,7 +14,7 @@ let count = 0;
 export const MjmlDomRender = () => {
   const { pageData: sourcePageData } = useEditorContext();
   const [pageData, setPageData] = useState<IPage | null>(sourcePageData);
-  const lazySourcePageData = useLazyState(sourcePageData, 100);
+  const lazySourcePageData = useLazyState(sourcePageData, 10);
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const { dashed, mergeTags, enabledMergeTagsBadge } = useEditorProps();
   const [isTextFocus, setIsTextFocus] = useState(false);
@@ -90,7 +90,6 @@ export const MjmlDomRender = () => {
     const renderHtml = mjml(
       mjmlContent
     ).html;
-    console.log('renderHtml', +new Date() - begin);
     return renderHtml;
   }, [mergeTags, pageData]);
 

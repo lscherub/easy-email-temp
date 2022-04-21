@@ -13,13 +13,15 @@ import {
   useFocusIdx,
   useEditorContext,
   useEditorProps,
+  IEmailTemplate,
 } from 'easy-email-editor';
 import { cloneDeep } from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useFormState } from 'react-final-form';
 
 export function SourceCodePanel() {
   const { setValueByIdx, focusBlock } = useBlock();
-  const { formState: { values } } = useEditorContext();
+  const { values } = useFormState<IEmailTemplate>();
   const { focusIdx } = useFocusIdx();
 
   const [mjmlText, setMjmlText] = useState('');

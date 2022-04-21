@@ -1,13 +1,15 @@
-import { useBlock, useEditorContext, useFocusIdx } from 'easy-email-editor';
+import { IEmailTemplate, useBlock, useFocusIdx } from 'easy-email-editor';
 import { Collapse, Grid, Switch } from '@arco-design/web-react';
 import { AdvancedBlock, AdvancedType } from 'easy-email-core';
 import { TextField } from '@extensions/components/Form';
 import React, { useCallback } from 'react';
+import { useForm, useFormState } from 'react-final-form';
 
 export function Iteration() {
   const { focusIdx } = useFocusIdx();
   const { focusBlock } = useBlock();
-  const { formHelpers: { change } } = useEditorContext();
+  const { values } = useFormState<IEmailTemplate>();
+  const { change } = useForm();
   const iteration = focusBlock?.data.value?.iteration as
     | undefined
     | AdvancedBlock['data']['value']['iteration'];

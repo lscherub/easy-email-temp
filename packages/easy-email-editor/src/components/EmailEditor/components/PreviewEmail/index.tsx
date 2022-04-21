@@ -2,7 +2,6 @@ import React from 'react';
 
 import { usePreviewEmail } from '@/hooks/usePreviewEmail';
 import { useActiveTab } from '@/hooks/useActiveTab';
-import { ActiveTabKeys } from '@/components/Provider/BlocksProvider';
 import { SyncScrollShadowDom } from '@/components/UI/SyncScrollShadowDom';
 import { classnames } from '@/utils/classnames';
 import { SYNC_SCROLL_ELEMENT_CLASS_NAME } from '@/constants';
@@ -13,6 +12,7 @@ import { createPortal } from 'react-dom';
 export interface PreviewEmailProps {
   style?: React.CSSProperties;
   isActive: boolean;
+  isIframe?: boolean;
 }
 export function PreviewEmail(props: PreviewEmailProps) {
 
@@ -23,7 +23,6 @@ export function PreviewEmail(props: PreviewEmailProps) {
 
   const fonts = pageData.data.value.fonts || [];
 
-  const isMobile = activeTab === ActiveTabKeys.MOBILE;
 
   if (errMsg) {
     return (
@@ -33,9 +32,10 @@ export function PreviewEmail(props: PreviewEmailProps) {
     );
   }
 
-  if (isMobile) {
+  if (props.isIframe) {
     return (
       <SyncScrollIframeComponent
+        isActive={props.isActive}
         style={{
           border: 'none',
           height: '100%',

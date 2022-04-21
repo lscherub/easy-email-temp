@@ -61,7 +61,7 @@ export function MobileEmailPreview() {
               overflow: 'hidden'
             }}
           >
-            <PreviewEmail isActive={activeTab === ActiveTabKeys.MOBILE} />
+            <PreviewEmail isIframe isActive={activeTab === ActiveTabKeys.MOBILE} />
           </div>
         </div>
 
