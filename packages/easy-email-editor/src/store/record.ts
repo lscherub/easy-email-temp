@@ -1,5 +1,4 @@
 import { IEmailTemplate } from '@/typings';
-import { cloneDeep } from 'lodash';
 import { makeAutoObservable } from 'mobx';
 
 const MAX_RECORD_SIZE = 50;
@@ -32,7 +31,10 @@ export const record = new (class {
   addRecord = (record: IEmailTemplate) => {
     this.setStatus(RecordStatus.add);
     this.recordIndex += 1;
-    this.records.push(JSON.stringify(record));
+    this.records = [
+      ...this.records.slice(0, this.recordIndex),
+      JSON.stringify(record),
+    ];
   };
 
   setRecordIndex = (index: number) => {
@@ -51,11 +53,13 @@ export const record = new (class {
   }
 
   redo = (index: number = 1) => {
+    this.setStatus(RecordStatus.redo);
     this.setRecordIndex(index);
     return JSON.parse(this.currentData) as IEmailTemplate;
   };
 
   undo = (index: number = 1) => {
+    this.setStatus(RecordStatus.undo);
     this.setRecordIndex(-index);
     return JSON.parse(this.currentData) as IEmailTemplate;
   };
@@ -66,5 +70,13 @@ export const record = new (class {
 
   get redoable() {
     return this.recordIndex < this.records.length - 1;
+  }
+
+  get size() {
+    return this.records.length;
+  }
+
+  get index() {
+    return this.recordIndex;
   }
 })();

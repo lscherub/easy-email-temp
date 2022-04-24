@@ -5,9 +5,17 @@ import {
   getParentIdx,
   getSameParent,
   IPage,
-  BasicType,
   IBlockData,
+  BasicType,
+  AdvancedType,
 } from 'easy-email-core';
+
+export const verticalBlocks: string[] = [
+  BasicType.SECTION,
+  BasicType.GROUP,
+  AdvancedType.SECTION,
+  AdvancedType.GROUP,
+];
 import { DirectionPosition } from './getDirectionPosition';
 
 interface Params {
@@ -57,8 +65,19 @@ function getInsetParentAndIndex(
       );
 
       if (!valid) return null;
-      const isVertical =
-        parent.type === BasicType.SECTION || parent.type === BasicType.GROUP;
+
+      const isVertical = verticalBlocks.includes(parent.type);
+      if (isVertical && parent.children.length > 0) {
+        const isTop = directionPosition.vertical.direction === 'top';
+        return {
+          insertIndex: isTop
+            ? getIndexByIdx(parentIdx)
+            : getIndexByIdx(parentIdx) + 1,
+          parentIdx: getParentIdx(parentIdx)!,
+          endDirection: directionPosition.vertical.direction,
+          hoverIdx: parentIdx,
+        };
+      }
 
       let insertIndex = 0; // 默认为0，表示拖拽到一个空children的节点
       let endDirection = direction;
@@ -132,8 +151,7 @@ function getValidDirection(
   targetType: string,
   directionPosition: DirectionPosition
 ): { valid: boolean; direction: string; isEdge: boolean } {
-  const isVertical =
-    targetType === BasicType.SECTION || targetType === BasicType.GROUP;
+  const isVertical = verticalBlocks.includes(targetType);
 
   let direction = directionPosition.vertical.direction;
   let isEdge = directionPosition.vertical.isEdge;

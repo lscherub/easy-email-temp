@@ -1,26 +1,31 @@
-import { getParentIdx, getIndexByIdx } from 'easy-email-core';
+import {
+  getParentIdx,
+  getIndexByIdx,
+  BlockManager,
+  getNodeIdxFromClassName,
+} from 'easy-email-core';
 import { useCallback, useEffect, useState } from 'react';
 import {
   getBlockNodeByChildEle,
   getDirectionPosition,
-  store,
   useEditorContext,
+  useHoverIdx,
   useRefState,
   useStateHelper,
 } from 'easy-email-editor';
-
-import { BlockManager, getNodeIdxFromClassName } from 'easy-email-core';
 import { debounce, get } from 'lodash';
 import { IBlockDataWithId } from '..';
 import { BlockTreeProps } from '../components/BlockTree';
 
-export const useAvatarWrapperDrop = () => {
+export function useAvatarWrapperDrop() {
   const [blockLayerRef, setBlockLayerRef] = useState<HTMLElement | null>(null);
 
-  const { setHoverIdx, setDirection } = useStateHelper();
+  const { setHoverIdx, setDirection, setDataTransfer } = useStateHelper();
+  const { dataTransfer } = useHoverIdx();
   const { values } = useEditorContext();
 
   const valuesRef = useRefState(values);
+  const dataTransferRef = useRefState(dataTransfer);
 
   function isKeyObject(o: any): o is {
     key: string;
@@ -94,13 +99,13 @@ export const useAvatarWrapperDrop = () => {
       setHoverIdx('');
       return false;
     },
-    [setDirection, setHoverIdx, valuesRef]
+    [setDirection, setHoverIdx, removeHightLightClassName]
   );
 
   useEffect(() => {
     if (blockLayerRef) {
       const onDragOver = debounce((ev: DragEvent) => {
-        if (!store.blockState.dataTransfer) return;
+        if (!dataTransferRef.current) return;
 
         const blockNode = getBlockNodeByChildEle(ev.target as HTMLDivElement);
         if (!blockNode || !ev.target) return;
@@ -136,7 +141,7 @@ export const useAvatarWrapperDrop = () => {
         }
         const dropResult = allowDrop({
           dragNode: {
-            type: store.blockState.dataTransfer.type,
+            type: dataTransferRef.current.type,
           },
           dropNode: {
             dataRef: dropBlockData,
@@ -159,22 +164,22 @@ export const useAvatarWrapperDrop = () => {
 
         if (dropResult.position === -1) {
           treeNodeEle.classList.add('arco-tree-node-title-gap-top');
-          store.blockState.setDataTransfer({
-            ...store.blockState.dataTransfer!,
+          setDataTransfer({
+            ...dataTransferRef.current,
             parentIdx: dropParentIdx,
             positionIndex: getIndexByIdx(dropIdx),
           });
         } else if (dropResult.position === 1) {
-          store.blockState.setDataTransfer({
-            ...store.blockState.dataTransfer!,
+          setDataTransfer({
+            ...dataTransferRef.current,
             parentIdx: dropParentIdx,
             positionIndex: getIndexByIdx(dropIdx) + 1,
           });
           treeNodeEle.classList.add('arco-tree-node-title-gap-bottom');
         } else {
           treeNodeEle.classList.add('arco-tree-node-title-highlight');
-          store.blockState.setDataTransfer({
-            ...store.blockState.dataTransfer!,
+          setDataTransfer({
+            ...dataTransferRef.current,
             parentIdx: dropIdx,
             positionIndex: 0,
           });
@@ -201,14 +206,7 @@ export const useAvatarWrapperDrop = () => {
         blockLayerRef.removeEventListener('dragleave', onDragend);
       };
     }
-  }, [
-    blockLayerRef,
-    valuesRef,
-    removeHightLightClassName,
-    allowDrop,
-    setDirection,
-    setHoverIdx,
-  ]);
+  }, [blockLayerRef, dataTransferRef, valuesRef, removeHightLightClassName]);
 
   return {
     setBlockLayerRef,
@@ -216,7 +214,7 @@ export const useAvatarWrapperDrop = () => {
     allowDrop,
     removeHightLightClassName,
   };
-};
+}
 
 export function getDirectionFormDropPosition(position: number) {
   if (position === -1) return 'top';

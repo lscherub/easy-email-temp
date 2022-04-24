@@ -21,7 +21,6 @@ export { useStateHelper } from './hooks/useStateHelper';
 export { useFocusBlockLayout } from './hooks/useFocusBlockLayout';
 export * from './hooks/useFocusIdx';
 export * from './hooks/useHoverIdx';
-export { store } from './store';
 
 export { ActiveTabKeys } from './components/Provider/BlocksProvider';
 

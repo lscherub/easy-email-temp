@@ -1,11 +1,18 @@
+import { useObserver } from 'mobx-react-lite';
 import { store } from '@/store';
 
 export function useRecord() {
-  const { redo, undo, redoable, undoable } = store.record;
-  return {
-    redo,
-    undo,
-    redoable,
-    undoable,
-  };
+  return useObserver(() => {
+    const { redo, undo } = store.block;
+    const { redoable, undoable, size, index, records } = store.record;
+    return {
+      redo,
+      undo,
+      redoable,
+      undoable,
+      size,
+      index,
+      records,
+    };
+  });
 }

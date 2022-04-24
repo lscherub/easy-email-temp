@@ -3,7 +3,6 @@ import { camelCase } from 'lodash';
 import React from 'react';
 import {
   getNodeTypeFromClassName,
-  MERGE_TAG_CLASS_NAME,
 } from 'easy-email-core';
 import { isTextBlock } from './isTextBlock';
 import { MergeTagBadge } from './MergeTagBadge';
@@ -48,6 +47,12 @@ export function HtmlStringToReactNodes(
   let doc = domParser.parseFromString(content, 'text/html'); // The average time is about 1.4 ms
   [...doc.getElementsByTagName('a')].forEach((node) => {
     node.setAttribute('tabIndex', '-1');
+  });
+  [...doc.querySelectorAll('.node-type-advanced_image img, .node-type-advanced_image img')].forEach((node) => {
+
+    if (!node.getAttribute('src')) {
+      node.setAttribute('src', 'https://easy-email-m-ryan.vercel.app/images/06ca521d-9728-4de6-a709-1b75a828bfc3-2a9b1224-3d71-43b8-b52f-e7cdcdc9107b.png');
+    }
   });
   [...doc.querySelectorAll(`.${getNodeTypeClassName(BasicType.TEXT)}`)].forEach((child) => {
     const editNode = child.querySelector('div');

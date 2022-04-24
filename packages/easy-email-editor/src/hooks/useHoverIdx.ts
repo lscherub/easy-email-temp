@@ -6,5 +6,6 @@ export function useHoverIdx() {
     hoverIdx: store.blockState.hoverIdx,
     isDragging: store.blockState.isDragging,
     direction: store.blockState.direction,
+    dataTransfer: store.blockState.dataTransfer,
   }));
 }

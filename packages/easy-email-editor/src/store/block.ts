@@ -21,29 +21,24 @@ export const block = new (class {
 
   setData = (val: IEmailTemplate) => {
     this._data = val;
+    if (!this.initialized) {
+      record.addRecord(val);
+    }
     this.initialized = true;
-    record.addRecord(val);
   };
 
-  update(name: string, value: any) {
-    if (
-      record.status === RecordStatus.redo ||
-      record.status === RecordStatus.undo
-    ) {
-      record.setStatus(undefined);
-    } else {
-      record.addRecord(this.data);
-    }
+  update = (name: string, value: any) => {
     set(this.data, name, value);
-  }
+    record.addRecord(this.data);
+  };
 
-  redo(index: number = 1) {
+  redo = (index: number = 1) => {
     const next = record.redo(index);
     this.setData(next);
-  }
+  };
 
-  undo(index: number = 1) {
-    const next = record.undo(index);
-    this.setData(next);
-  }
+  undo = (index: number = 1) => {
+    const prev = record.undo(index);
+    this.setData(prev);
+  };
 })();

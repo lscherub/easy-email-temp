@@ -7,5 +7,6 @@ export function useStateHelper() {
     setIsDragging: store.blockState.setIsDragging,
     setDirection: store.blockState.setDirection,
     setFocusIdx: store.blockState.setFocusIdx,
+    setDataTransfer: store.blockState.setDataTransfer,
   }));
 }
