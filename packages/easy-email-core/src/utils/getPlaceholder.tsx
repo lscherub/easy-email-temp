@@ -4,7 +4,7 @@ import { AdvancedType, BasicType } from '@core/constants';
 
 
 export function getPlaceholder(type: string) {
-  let text = '';
+  let text: null | string = null;
   if (type === BasicType.PAGE) {
     text = 'Drop a Wrapper block here';
   } else if (type === BasicType.WRAPPER || type === AdvancedType.WRAPPER) {
@@ -19,6 +19,8 @@ export function getPlaceholder(type: string) {
   } else if (type === BasicType.COLUMN || type === AdvancedType.COLUMN) {
     text = 'Drop a content block here';
   }
+
+  if (!text) return null;
 
   return `
    <mj-text color="#666">
